@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulado Interativo de Inglês - 7º Ano</title>
+  <style>
+    /* Reset & Base Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #0f172a;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #000;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    /* Scrollbar Estilizada em Vermelho */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 5px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #dc2626;
+      border-radius: 5px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #b91c1c;
+    }
+
+    /* Header e Navegação */
+    header {
+      width: 100%;
+      max-width: 850px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #ffffff;
+      margin-bottom: 15px;
+      font-size: 1.8rem;
+    }
+
+    .nav-grid {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
+      border: 2px solid #ffffff;
+      background-color: #1e293b;
+      color: #ffffff;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn:hover {
+      background-color: #334155;
+    }
+
+    .nav-btn.active {
+      border-color: #f59e0b;
+      box-shadow: 0 0 8px #f59e0b;
+    }
+
+    .nav-btn.correct {
+      background-color: #16a34a !important;
+      border-color: #16a34a !important;
+      color: #fff;
+    }
+
+    .nav-btn.incorrect {
+      background-color: #dc2626 !important;
+      border-color: #dc2626 !important;
+      color: #fff;
+    }
+
+    /* Container Principal */
+    .container {
+      background-color: #ffffff;
+      border: 3px solid #dc2626;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 850px;
+      padding: 30px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      position: relative;
+    }
+
+    .question-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 10px;
+    }
+
+    .question-title {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #000;
+    }
+
+    /* Pinned Text (Texto Fixo no Topo para Questão 1) */
+    .pinned-text-box {
+      max-height: 200px;
+      overflow-y: auto;
+      background-color: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-left: 4px solid #dc2626;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #000;
+    }
+
+    .pinned-text-box h4 {
+      margin-bottom: 8px;
+      color: #dc2626;
+    }
+
+    /* Enunciado */
+    .statement {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      color: #000;
+      font-weight: 500;
+    }
+
+    /* Opções de Resposta */
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+
+    .option-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 12px 15px;
+      border: 2px solid #cbd5e1;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s, border-color 0.2s;
+      background-color: #fff;
+    }
+
+    .option-item:hover {
+      background-color: #f1f5f9;
+      border-color: #94a3b8;
+    }
+
+    .option-item input[type="radio"] {
+      margin-top: 4px;
+      margin-right: 12px;
+      cursor: pointer;
+    }
+
+    .option-text {
+      font-size: 1rem;
+      color: #000;
+      line-height: 1.4;
+    }
+
+    .option-item.selected {
+      border-color: #dc2626;
+      background-color: #fef2f2;
+    }
+
+    .option-item.correct-bg {
+      background-color: #dcfce7 !important;
+      border-color: #16a34a !important;
+    }
+
+    .option-item.incorrect-bg {
+      background-color: #fee2e2 !important;
+      border-color: #dc2626 !important;
+    }
+
+    /* Justificativa / Feedback */
+    .feedback-box {
+      display: none;
+      background-color: #f8fafc;
+      border-left: 4px solid #0284c7;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: #000;
+    }
+
+    .feedback-box.show {
+      display: block;
+    }
+
+    .feedback-box strong {
+      color: #0284c7;
+    }
+
+    /* Botões de Ação na ordem obrigatória: [ Next ] [ Check ] [ Previous ] */
+    .action-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .btn {
+      background-color: #dc2626;
+      color: #ffffff;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      flex: 1;
+      max-width: 150px;
+      text-align: center;
+    }
+
+    .btn:hover {
+      background-color: #b91c1c;
+    }
+
+    .btn:disabled {
+      background-color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .btn-finish {
+      background-color: #16a34a;
+      max-width: 200px;
+    }
+
+    .btn-finish:hover {
+      background-color: #15803d;
+    }
+
+    /* Modal de Resultado Final */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.75);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background-color: #ffffff;
+      border: 3px solid #dc2626;
+      border-radius: 10px;
+      max-width: 650px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 30px;
+      color: #000;
+    }
+
+    .modal-header {
+      text-align: center;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 10px;
+    }
+
+    .modal-header h2 {
+      color: #dc2626;
+      font-size: 1.8rem;
+    }
+
+    .score-display {
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #0f172a;
+    }
+
+    .stats-container {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+      background-color: #f8fafc;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+
+    .stat-value.correct { color: #16a34a; }
+    .stat-value.incorrect { color: #dc2626; }
+
+    .diagnostics-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #0f172a;
+    }
+
+    .diagnostics-list {
+      list-style-type: disc;
+      padding-left: 20px;
+      margin-bottom: 25px;
+      line-height: 1.6;
+    }
+
+    .modal-footer {
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 15px;
+      }
+      .action-buttons {
+        flex-direction: row;
+      }
+      .btn {
+        padding: 10px 8px;
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Simulado de Língua Inglesa - 7º Ano</h1>
+    <div class="nav-grid" id="nav-grid">
+      <!-- Botões de 1 a 10 gerados dinamicamente -->
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="question-header">
+      <span class="question-title" id="question-title">Questão 1 de 10</span>
+    </div>
+
+    <!-- Pinned Text (Exibido apenas na Questão 1) -->
+    <div class="pinned-text-box" id="pinned-text-box" style="display: none;">
+      <h4>Texto Base:</h4>
+      <p id="pinned-text-content"></p>
+    </div>
+
+    <!-- Enunciado -->
+    <div class="statement" id="statement-text">
+      <!-- Conteúdo da questão carregado aqui -->
+    </div>
+
+    <!-- Opções -->
+    <div class="options-list" id="options-list">
+      <!-- Alternativas carregadas aqui -->
+    </div>
+
+    <!-- Justificativa -->
+    <div class="feedback-box" id="feedback-box">
+      <strong>Justificativa:</strong> <span id="feedback-text"></span>
+    </div>
+
+    <!-- Botões de Ação na Ordem Obrigatória: [ Next ] [ Check ] [ Previous ] -->
+    <div class="action-buttons">
+      <button class="btn" id="btn-next" onclick="nextQuestion()">Next</button>
+      <button class="btn" id="btn-check" onclick="checkAnswer()">Check</button>
+      <button class="btn" id="btn-prev" onclick="prevQuestion()">Previous</button>
+    </div>
+  </main>
+
+  <!-- Modal de Resultado Final -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Resultado do Simulado</h2>
+      </div>
+      <div class="score-display" id="score-display">
+        Sua Nota: 0,0 / 8,0
+      </div>
+      <div class="stats-container">
+        <div class="stat-item">
+          <div>Acertos</div>
+          <div class="stat-value correct" id="stat-correct">0 (0%)</div>
+        </div>
+        <div class="stat-item">
+          <div>Erros</div>
+          <div class="stat-value incorrect" id="stat-incorrect">0 (0%)</div>
+        </div>
+      </div>
+      <div class="diagnostics-title">Diagnóstico e Recomendações Pedagógicas:</div>
+      <ul class="diagnostics-list" id="diagnostics-list">
+        <!-- Diagnóstico dinâmico em Português -->
+      </ul>
+      <div class="modal-footer">
+        <button class="btn btn-finish" onclick="restartQuiz()">Refazer Simulado</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // TEXTO BASE PARA A QUESTÃO 1 (Mantido exatamente como solicitado)
+    const textBase1 = `"Global Environmental Challenges and Possible Solutions"\n\n` +
+      `According to a report by the World Health Organization (WHO), nearly 99% of the global population breathes air that exceeds safety limits. ` +
+      `In 2021 alone, ambient and household air pollution caused around 6.6 million premature deaths worldwide. Environmental scientists from the International ` +
+      `Union for Conservation of Nature (IUCN) also estimate that between 15% and 31% of all microplastics in the ocean originate from primary land-based sources, ` +
+      `such as synthetic clothing and vehicle tire wear. These scientific data demonstrate that toxic emissions and industrial waste present severe risks to human health ` +
+      `and natural ecosystems across the entire planet.\n\n` +
+      `However, environmental experts emphasize that this situation can be significantly improved under specific technical and political conditions. For instance, ` +
+      `if governments implemented strict clean energy policies and invested in public electric transportation, urban air pollution would drop by up to 45% within a decade. ` +
+      `Furthermore, if global industries reduced plastic packaging production by 5% each year, microplastic accumulation in marine environments would stabilize before ` +
+      `the end of the century. Therefore, resolving environmental degradation requires international cooperation, enforcement of ecological laws, and immediate industrial structural changes.`;
+
+    // BASE DE DADOS DAS QUESTÕES DO 7º ANO
+    const rawQuestions = [
+      {
+        id: 1,
+        topic: "Compreensão Textual",
+        pinnedText: textBase1,
+        statement: "Ao analisar a estruturação das informações no texto, percebe-se que o autor organiza as evidências científicas e as propostas ecológicas com um propósito comunicativo específico. O objetivo principal do texto é:",
+        correctKey: "D",
+        options: {
+          A: "Demonstrar a ineficácia das políticas ecológicas atuais diante de dados estatísticos irreversíveis de contaminação atmosférica e marinha.",
+          B: "Alertar os leitores sobre como as escolhas individuais de consumo de plásticos e transportes são as únicas causadoras de mortes prematuras no mundo.",
+          C: "Provar cientificamente que a poluição do ar e o acúmulo de microplásticos já atingiram seus níveis máximos e tendem a se estabilizar naturalmente até o fim do século.",
+          D: "Sensibilizar o leitor sobre a urgência do problema ambiental, apresentando dados de degradação e condicionando a mitigação à adoção de medidas governamentais e industriais.",
+          E: "Exigir a substituição imediata de toda a frota global de veículos a combustível fósseis como a única solução viável para combater as doenças respiratórias."
+        },
+        justification: "Resposta correta: D. O texto apresenta dados alarmantes sobre a poluição no primeiro parágrafo para conscientizar o leitor e, no segundo parágrafo, condiciona as soluções a ações de governos e indústrias."
+      },
+      {
+        id: 2,
+        topic: "Simple Past - Verbos Irregulares",
+        pinnedText: null,
+        statement: "Leia o diálogo abaixo:\n\n" +
+          "<b>Leo:</b> Did you go to the science museum yesterday?\n" +
+          "<b>Maya:</b> Yes! I __________ a lot of interesting dinosaurs and ancient fossils there.\n\n" +
+          "Qual verbo irregular na forma afirmativa do <i>Simple Past</i> preenche corretamente a lacuna no diálogo?",
+        correctKey: "B",
+        options: {
+          A: "see",
+          B: "saw",
+          C: "seed",
+          D: "sawed",
+          E: "seen"
+        },
+        justification: "Resposta correta: B. O verbo 'see' (ver) é um verbo irregular. A sua forma no passado simples (Simple Past) em frases afirmativas é 'saw'."
+      },
+      {
+        id: 3,
+        topic: "Simple Past - Forma Negativa",
+        pinnedText: null,
+        statement: "Leia o diálogo abaixo:\n\n" +
+          "<b>Tom:</b> Did Paul finish his math project on time?\n" +
+          "<b>Julia:</b> No, <b><u>Paul finished his math project on time</u></b>.\n\n" +
+          "Assinale a alternativa que apresenta a forma NEGATIVA correta no <i>Simple Past</i> para a frase em destaque no diálogo:",
+        correctKey: "C",
+        options: {
+          A: "Paul didn't finished his math project on time.",
+          B: "Paul not finished his math project on time.",
+          C: "Paul didn't finish his math project on time.",
+          D: "Paul doesn't finish his math project on time.",
+          E: "Paul wasn't finish his math project on time."
+        },
+        justification: "Resposta correta: C. Para formar a negativa no Simple Past, utilizamos o verbo auxiliar 'didn't' (did not) acompanhado do verbo principal na sua forma base sem o 'ed' ('finish')."
+      },
+      {
+        id: 4,
+        topic: "Simple Past - Forma Interrogativa",
+        pinnedText: null,
+        statement: "Leia o diálogo abaixo:\n\n" +
+          "<b>Anna:</b> I am looking for Alex. <b><u>You bought the tickets for the movie</u></b>?\n" +
+          "<b>Bruno:</b> Yes, I did! We are ready to go.\n\n" +
+          "Assinale a alternativa que transforma a frase em destaque na forma INTERROGATIVA correta do <i>Simple Past</i>:",
+        correctKey: "A",
+        options: {
+          A: "Did you buy the tickets for the movie?",
+          B: "Did you bought the tickets for the movie?",
+          C: "Do you bought the tickets for the movie?",
+          D: "Were you buy the tickets for the movie?",
+          E: "Bought you the tickets for the movie?"
+        },
+        justification: "Resposta correta: A. As perguntas no Simple Past iniciam com o auxiliar 'Did', seguido do sujeito e do verbo principal na forma base ('buy', e não 'bought')."
+      },
+      {
+        id: 5,
+        topic: "Simple Past - Classificação dos Verbos",
+        pinnedText: null,
+        statement: "Leia o diálogo abaixo:\n\n" +
+          "<b>Lucas:</b> We <b><u>visited</u></b> our grandparents, <b><u>ate</u></b> a delicious cake and <b><u>played</u></b> soccer in the garden.\n" +
+          "<b>Carla:</b> Sounds like a wonderful weekend!\n\n" +
+          "Assinale a opção que classifica os três verbos em destaque (<i>visited</i>, <i>ate</i>, <i>played</i>) como REGULAR ou IRREGULAR, respectivamente:",
+        correctKey: "E",
+        options: {
+          A: "irregular, regular, irregular",
+          B: "regular, regular, irregular",
+          C: "irregular, irregular, regular",
+          D: "regular, irregular, irregular",
+          E: "regular, irregular, regular"
+        },
+        justification: "Resposta correta: E. 'Visited' é regular (visit + ed); 'ate' é irregular (passado do verbo eat); 'played' é regular (play + ed). A sequência correta é regular, irregular, regular."
+      },
+      {
+        id: 6,
+        topic: "Uso do When e While",
+        pinnedText: null,
+        statement: "Observe o diálogo a seguir:\n\n" +
+          "<b>Teacher:</b> What happened during your online English class?\n" +
+          "<b>Student:</b> I was taking notes __________ the electricity suddenly went off.\n\n" +
+          "Qual alternativa preenche corretamente a lacuna, utilizando a conjunção adequada para indicar uma ação pontual que interrompeu outra em andamento?",
+        correctKey: "A",
+        options: {
+          A: "when",
+          B: "while",
+          C: "during",
+          D: "where",
+          E: "which"
+        },
+        justification: "Resposta correta: A. Usamos 'when' (quando) para introduzir uma ação pontual e rápida no Simple Past ('the electricity suddenly went off') que interrompe uma ação contínua no Past Continuous ('was taking notes')."
+      },
+      {
+        id: 7,
+        topic: "Uso do When e While",
+        pinnedText: null,
+        statement: "Observe o diálogo a seguir:\n\n" +
+          "<b>Gabi:</b> Why did your dog start barking so loudly last night?\n" +
+          "<b>Pedro:</b> He was sleeping quietly __________ my dad opened the front door.\n\n" +
+          "Assinale a alternativa que completa corretamente o diálogo com a conjunção temporal adequada:",
+        correctKey: "B",
+        options: {
+          A: "while",
+          B: "when",
+          C: "what",
+          D: "who",
+          E: "because"
+        },
+        justification: "Resposta correta: B. A conjunção 'when' é usada para indicar o momento exato em que um evento no passado simples ('my dad opened...') aconteceu enquanto outra ação estava em andamento."
+      },
+      {
+        id: 8,
+        topic: "Uso do When e While",
+        pinnedText: null,
+        statement: "Observe o diálogo a seguir:\n\n" +
+          "<b>Mom:</b> What were you and your brother doing in the afternoon?\n" +
+          "<b>Kevin:</b> I was studying for my exam __________ my brother was playing video games in his bedroom.\n\n" +
+          "Assinale a alternativa que preenche a lacuna do diálogo corretamente com 'while':",
+        correctKey: "C",
+        options: {
+          A: "when",
+          B: "where",
+          C: "while",
+          D: "which",
+          E: "who"
+        },
+        justification: "Resposta correta: C. Usamos 'while' (enquanto) para ligar duas ações simultâneas e contínuas no passado, ambas expressas no Past Continuous ('was studying' / 'was playing')."
+      },
+      {
+        id: 9,
+        topic: "Uso de When e While em Excertos",
+        pinnedText: null,
+        statement: "Leia o excerto abaixo:\n\n" +
+          "<i>\"The young scientist was checking her laboratory results when __________.\"</i>\n\n" +
+          "Assinale a frase que preenche a lacuna corretamente após a palavra <b>when</b>, respeitando a estrutura gramatical adequada:",
+        correctKey: "D",
+        options: {
+          A: "she was hearing a strange noise outside",
+          B: "she is hearing a strange noise outside",
+          C: "she hears a strange noise outside",
+          D: "she heard a strange noise outside",
+          E: "she will hear a strange noise outside"
+        },
+        justification: "Resposta correta: D. Após a palavra 'when' para indicar interrupção de uma ação contínua no passado, deve-se utilizar uma oração com verbo no Simple Past ('she heard a strange noise outside')."
+      },
+      {
+        id: 10,
+        topic: "Uso de When e While em Excertos",
+        pinnedText: null,
+        statement: "Leia o excerto abaixo:\n\n" +
+          "<i>\"The students were taking notes quietly in the classroom while __________.\"</i>\n\n" +
+          "Assinale a frase que preenche a lacuna corretamente após a palavra <b>while</b>, indicando uma ação simultânea em andamento:",
+        correctKey: "A",
+        options: {
+          A: "the teacher was explaining the grammar rule",
+          B: "the teacher explained the grammar rule",
+          C: "the teacher explains the grammar rule",
+          D: "the teacher has explained the grammar rule",
+          E: "the teacher will explain the grammar rule"
+        },
+        justification: "Resposta correta: A. A palavra 'while' expressa uma ação prolongada e simultânea ocorrendo ao mesmo tempo no passado, exigindo o Past Continuous ('the teacher was explaining...')."
+      }
+    ];
+
+    // ESTADO DA APLICAÇÃO E EMBARALHAMENTO DO GABARITO
+    let processedQuestions = [];
+    let userAnswers = {}; // { questionIndex: selectedLetter }
+    let checkedQuestions = {}; // { questionIndex: boolean }
+    let currentQuestionIndex = 0;
+
+    // Função de Embaralhamento (Fisher-Yates)
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // Inicialização e Embaralhamento das Opções para garantir imprevisibilidade do gabarito
+    function initQuizData() {
+      processedQuestions = rawQuestions.map((q) => {
+        const originalKeys = ['A', 'B', 'C', 'D', 'E'];
+        const optionsList = originalKeys.map(key => ({
+          originalKey: key,
+          text: q.options[key]
+        }));
+
+        // Embaralhar a ordem das alternativas
+        const shuffledOptions = shuffleArray(optionsList);
+
+        // Reatribuir rótulos A, B, C, D, E e identificar o novo gabarito
+        const newLetterLabels = ['A', 'B', 'C', 'D', 'E'];
+        let mappedCorrectLetter = '';
+
+        const finalOptions = shuffledOptions.map((opt, index) => {
+          const currentLabel = newLetterLabels[index];
+          if (opt.originalKey === q.correctKey) {
+            mappedCorrectLetter = currentLabel;
+          }
+          return {
+            label: currentLabel,
+            text: opt.text,
+            originalKey: opt.originalKey
+          };
+        });
+
+        return {
+          ...q,
+          displayOptions: finalOptions,
+          correctDisplayLetter: mappedCorrectLetter
+        };
+      });
+    }
+
+    // RENDERIZAÇÃO DA INTERFACE
+    function buildNavGrid() {
+      const navGrid = document.getElementById('nav-grid');
+      navGrid.innerHTML = '';
+      for (let i = 0; i < processedQuestions.length; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'nav-btn';
+        btn.id = `nav-btn-${i}`;
+        btn.innerText = i + 1;
+        btn.onclick = () => jumpToQuestion(i);
+        navGrid.appendChild(btn);
+      }
+      updateNavStatus();
+    }
+
+    function updateNavStatus() {
+      for (let i = 0; i < processedQuestions.length; i++) {
+        const btn = document.getElementById(`nav-btn-${i}`);
+        btn.classList.remove('active', 'correct', 'incorrect');
+
+        if (i === currentQuestionIndex) {
+          btn.classList.add('active');
+        }
+
+        if (checkedQuestions[i]) {
+          const isCorrect = userAnswers[i] === processedQuestions[i].correctDisplayLetter;
+          if (isCorrect) {
+            btn.classList.add('correct');
+          } else {
+            btn.classList.add('incorrect');
+          }
+        }
+      }
+    }
+
+    function renderQuestion(index) {
+      const q = processedQuestions[index];
+
+      // Atualizar Título da Questão
+      document.getElementById('question-title').innerText = `Questão ${index + 1} de 10`;
+
+      // Pinned Text Box (Apenas na Questão 1)
+      const pinnedBox = document.getElementById('pinned-text-box');
+      const pinnedContent = document.getElementById('pinned-text-content');
+      if (q.pinnedText) {
+        pinnedContent.innerText = q.pinnedText;
+        pinnedBox.style.display = 'block';
+      } else {
+        pinnedBox.style.display = 'none';
+      }
+
+      // Enunciado sem metadados pedagógicos
+      document.getElementById('statement-text').innerHTML = q.statement.replace(/\n/g, '<br>');
+
+      // Lista de Opções
+      const optionsContainer = document.getElementById('options-list');
+      optionsContainer.innerHTML = '';
+
+      const isChecked = checkedQuestions[index];
+
+      q.displayOptions.forEach((opt) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'option-item';
+
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = `option-${index}`;
+        radio.value = opt.label;
+        radio.id = `opt-${opt.label}`;
+        radio.disabled = !!isChecked;
+
+        if (userAnswers[index] === opt.label) {
+          radio.checked = true;
+          itemDiv.classList.add('selected');
+        }
+
+        if (isChecked) {
+          if (opt.label === q.correctDisplayLetter) {
+            itemDiv.classList.add('correct-bg');
+          } else if (userAnswers[index] === opt.label) {
+            itemDiv.classList.add('incorrect-bg');
+          }
+        } else {
+          itemDiv.onclick = () => selectOption(index, opt.label);
+        }
+
+        const labelSpan = document.createElement('span');
+        labelSpan.className = 'option-text';
+        labelSpan.innerHTML = `<strong>${opt.label})</strong> ${opt.text}`;
+
+        itemDiv.appendChild(radio);
+        itemDiv.appendChild(labelSpan);
+        optionsContainer.appendChild(itemDiv);
+      });
+
+      // Justificativa / Feedback
+      const feedbackBox = document.getElementById('feedback-box');
+      const feedbackText = document.getElementById('feedback-text');
+      if (isChecked) {
+        let textJust = q.justification;
+        textJust = textJust.replace(/Resposta correta: [A-E]\./, `Resposta correta: ${q.correctDisplayLetter}.`);
+        feedbackText.innerText = textJust;
+        feedbackBox.classList.add('show');
+      } else {
+        feedbackBox.classList.remove('show');
+      }
+
+      // Estado dos Botões
+      const btnCheck = document.getElementById('btn-check');
+      btnCheck.disabled = !userAnswers[index] || isChecked;
+
+      const btnNext = document.getElementById('btn-next');
+      if (index === processedQuestions.length - 1) {
+        btnNext.innerText = 'Finish';
+        btnNext.classList.add('btn-finish');
+      } else {
+        btnNext.innerText = 'Next';
+        btnNext.classList.remove('btn-finish');
+      }
+
+      const btnPrev = document.getElementById('btn-prev');
+      btnPrev.disabled = index === 0;
+
+      updateNavStatus();
+    }
+
+    // AÇÕES DO USUÁRIO
+    function selectOption(qIndex, label) {
+      if (checkedQuestions[qIndex]) return;
+      userAnswers[qIndex] = label;
+
+      const items = document.querySelectorAll('.option-item');
+      items.forEach(item => item.classList.remove('selected'));
+
+      const radio = document.getElementById(`opt-${label}`);
+      if (radio) {
+        radio.checked = true;
+        radio.closest('.option-item').classList.add('selected');
+      }
+
+      document.getElementById('btn-check').disabled = false;
+    }
+
+    function checkAnswer() {
+      if (!userAnswers[currentQuestionIndex]) return;
+      checkedQuestions[currentQuestionIndex] = true;
+      renderQuestion(currentQuestionIndex);
+    }
+
+    function jumpToQuestion(index) {
+      currentQuestionIndex = index;
+      renderQuestion(currentQuestionIndex);
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIndex < processedQuestions.length - 1) {
+        currentQuestionIndex++;
+        renderQuestion(currentQuestionIndex);
+      } else {
+        finishQuiz();
+      }
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        renderQuestion(currentQuestionIndex);
+      }
+    }
+
+    // AVALIAÇÃO E RELATÓRIO FINAL
+    function finishQuiz() {
+      let totalCorrect = 0;
+      let topicErrors = {};
+      let topicTotals = {};
+
+      processedQuestions.forEach((q, idx) => {
+        const topic = q.topic;
+        if (!topicTotals[topic]) {
+          topicTotals[topic] = 0;
+          topicErrors[topic] = 0;
+        }
+        topicTotals[topic]++;
+
+        const userAns = userAnswers[idx];
+        if (userAns === q.correctDisplayLetter) {
+          totalCorrect++;
+        } else {
+          topicErrors[topic]++;
+        }
+      });
+
+      const totalQuestions = processedQuestions.length;
+      const totalIncorrect = totalQuestions - totalCorrect;
+      const score = (totalCorrect * 0.8).toFixed(1);
+
+      const correctPct = Math.round((totalCorrect / totalQuestions) * 100);
+      const incorrectPct = Math.round((totalIncorrect / totalQuestions) * 100);
+
+      document.getElementById('score-display').innerText = `Sua Nota: ${score.replace('.', ',')} / 8,0`;
+      document.getElementById('stat-correct').innerText = `${totalCorrect} (${correctPct}%)`;
+      document.getElementById('stat-incorrect').innerText = `${totalIncorrect} (${incorrectPct}%)`;
+
+      // Diagnóstico Pedagógico em Português para erros > 30%
+      const diagnosticsList = document.getElementById('diagnostics-list');
+      diagnosticsList.innerHTML = '';
+
+      let needsRevision = false;
+
+      for (const topic in topicTotals) {
+        const errors = topicErrors[topic];
+        const total = topicTotals[topic];
+        const errorPct = (errors / total) * 100;
+
+        if (errorPct > 30) {
+          needsRevision = true;
+          const li = document.createElement('li');
+          let recommendationText = "";
+
+          if (topic === "Compreensão Textual") {
+            recommendationText = "<strong>Compreensão Textual:</strong> Revisar a leitura e identificação de objetivos principais em textos expositivos em inglês.";
+          } else if (topic.includes("Simple Past")) {
+            recommendationText = "<strong>Simple Past (Passado Simples):</strong> Estudar a lista de verbos irregulares, a formação de frases afirmativas e o uso do auxiliar <i>did / didn't</i> nas formas interrogativas e negativas.";
+          } else if (topic.includes("When") || topic.includes("While")) {
+            recommendationText = "<strong>Uso de When e While:</strong> Revisar a regra: use <i>when</i> antes de ações curtas/pontuais no Simple Past e <i>while</i> antes de ações contínuas/simultâneas no Past Continuous.";
+          } else {
+            recommendationText = `<strong>${topic}:</strong> Recomenda-se reforçar este conteúdo através de novos exercícios práticos.`;
+          }
+
+          li.innerHTML = recommendationText;
+          diagnosticsList.appendChild(li);
+        }
+      }
+
+      if (!needsRevision) {
+        const li = document.createElement('li');
+        li.innerHTML = "<strong>Parabéns!</strong> Você apresentou um excelente desempenho em todos os tópicos (taxa de erro inferior a 30%). Continue praticando!";
+        diagnosticsList.appendChild(li);
+      }
+
+      document.getElementById('modal-overlay').style.display = 'flex';
+    }
+
+    function restartQuiz() {
+      userAnswers = {};
+      checkedQuestions = {};
+      currentQuestionIndex = 0;
+      document.getElementById('modal-overlay').style.display = 'none';
+      initQuizData();
+      buildNavGrid();
+      renderQuestion(0);
+    }
+
+    // Inicialização do aplicativo
+    window.onload = function() {
+      initQuizData();
+      buildNavGrid();
+      renderQuestion(0);
+    };
+  </script>
+</body>
+</html>
